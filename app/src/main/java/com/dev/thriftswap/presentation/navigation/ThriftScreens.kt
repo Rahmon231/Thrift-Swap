@@ -1,4 +1,4 @@
-package com.dev.thriftswap.navigation
+package com.dev.thriftswap.presentation.navigation
 
 import java.lang.IllegalArgumentException
 

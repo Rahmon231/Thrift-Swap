@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "253085463522",
+    "project_id": "thrift-swap-028",
+    "storage_bucket": "thrift-swap-028.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:253085463522:android:84a80bb0856ffb2511bfbb",
+        "android_client_info": {
+          "package_name": "com.dev.thriftswap"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDDY7QUe00PbZWq9r4U1AZF0J2iOx10CRg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

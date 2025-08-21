@@ -1,4 +1,4 @@
-package com.dev.thriftswap.navigation
+package com.dev.thriftswap.presentation.navigation
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
