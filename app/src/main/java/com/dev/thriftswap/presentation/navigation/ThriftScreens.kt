@@ -5,14 +5,15 @@ import java.lang.IllegalArgumentException
 enum class ThriftScreens {
     SplashScreen,
     OnBoardingScreen,
-    SignupScreen,
+
+    RegisterScreen,
     HomeScreen;
     companion object {
         fun fromRoute(route: String?): ThriftScreens
         = when (route?.substringBefore("/")) {
             SplashScreen.name -> SplashScreen
             OnBoardingScreen.name -> OnBoardingScreen
-            SignupScreen.name -> SignupScreen
+            RegisterScreen.name -> RegisterScreen
             HomeScreen.name -> HomeScreen
 
             null -> HomeScreen
