@@ -13,14 +13,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.dev.thriftswap.R
+import com.dev.thriftswap.presentation.components.AppLogo
 import com.dev.thriftswap.presentation.navigation.ThriftScreens
 
 @Composable
@@ -28,7 +32,7 @@ fun OnboardingScreen(navController: NavController) {
     OnboardingContent(
         onGoogleClick = { /* Handle Google button click */ },
         onAppleClick = { /* Handle Apple button click */ },
-        onEmailClick = { /* Handle Email button click */ },
+        onEmailClick = { navController.navigate(ThriftScreens.RegisterScreen.name) },
         onSkip = { navController.navigate(ThriftScreens.HomeScreen.name) }
     )
 }
@@ -63,11 +67,12 @@ fun OnboardingContent(
                 .clickable { onSkip() },
             style = MaterialTheme.typography.bodyMedium.copy(
                 fontWeight = FontWeight.Bold,
-                color = Color.Black
+                color = Color.Black,
+                fontFamily = FontFamily(Font(R.font.roboto)),
+
             )
         )
 
-        // Center content
         Column(
             modifier = Modifier.align(Alignment.Center),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -78,28 +83,14 @@ fun OnboardingContent(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(80.dp)
-                        .clip(CircleShape)
-                        .background(Color(0xFF2F5D50)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "T",
-                        style = MaterialTheme.typography.headlineLarge.copy(
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold,
-                            fontFamily = FontFamily(Font(R.font.beau_rivage_regular))
-                        )
-                    )
-                }
+               AppLogo()
                 Spacer(modifier = Modifier.width(12.dp))
                 Text(
                     text = "Thrift Swap",
                     style = MaterialTheme.typography.headlineSmall.copy(
                         fontWeight = FontWeight.Bold,
                         color = Color.Black,
+                        fontSize = 32.sp,
                         fontFamily = FontFamily(Font(R.font.beau_rivage_regular))
                     )
                 )
@@ -125,7 +116,13 @@ fun OnboardingContent(
                     modifier = Modifier.size(20.dp)
                 )
                 Spacer(modifier = Modifier.width(12.dp))
-                Text("Continue with Google", color = Color.White)
+                Text("Continue with Google", 
+                    color = Color.White,
+                    style = TextStyle(
+                        fontFamily = FontFamily(Font(R.font.roboto)),
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 17.sp
+                    ))
             }
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -146,17 +143,22 @@ fun OnboardingContent(
                     modifier = Modifier.size(20.dp)
                 )
                 Spacer(modifier = Modifier.width(12.dp))
-                Text("Continue with Apple", color = Color.Black)
+                Text("Continue with Apple", color = Color.Black,
+                    style = TextStyle(
+                        fontFamily = FontFamily(Font(R.font.roboto)),
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 17.sp
+                    ))
             }
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // Divider "Or"
             Text(
                 text = "or",
                 style = MaterialTheme.typography.bodyMedium.copy(
                     color = Color.Gray,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.SemiBold,
+                    fontFamily = FontFamily(Font(R.font.roboto))
                 )
             )
 
@@ -167,8 +169,9 @@ fun OnboardingContent(
                 text = "Continue with Email",
                 modifier = Modifier.clickable { onEmailClick() },
                 style = MaterialTheme.typography.bodyMedium.copy(
-                    color = Color(0xFF2F5D50),
-                    fontWeight = FontWeight.Bold
+                    color = colorResource(R.color.green),
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = FontFamily(Font(R.font.roboto))
                 )
             )
         }
