@@ -1,7 +1,15 @@
 package com.dev.thriftswap.presentation.components
 
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.StartOffset
+import androidx.compose.animation.core.StartOffsetType
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,6 +19,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -40,6 +49,7 @@ import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -49,6 +59,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.colorResource
@@ -62,8 +73,10 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.util.lerp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
@@ -270,4 +283,66 @@ fun EmailInput(
             keyboardType = KeyboardType.Email,
             imeAction = imeAction),
         keyboardActions = onAction)
+}
+@Composable
+fun ThreeDotLoading(
+    dotSize: Dp = 12.dp,
+    dotColor: Color = MaterialTheme.colorScheme.primary,
+    spacing: Dp = 8.dp
+) {
+    val infiniteTransition = rememberInfiniteTransition()
+
+    // Animations for each dot
+    val anchor1 by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(500),
+            repeatMode = RepeatMode.Reverse
+        )
+    )
+    val anchor2 by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(500),
+            initialStartOffset = StartOffset(250, StartOffsetType.Delay),
+            repeatMode = RepeatMode.Reverse
+        )
+    )
+    val anchor3 by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(500),
+            initialStartOffset = StartOffset(500, StartOffsetType.Delay),
+            repeatMode = RepeatMode.Reverse
+        )
+    )
+
+    // Row to display dots
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(spacing),
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.wrapContentSize()
+    ) {
+        Dot(dotSize, dotColor, anchor1)
+        Dot(dotSize, dotColor, anchor2)
+        Dot(dotSize, dotColor, anchor3)
+    }
+}
+@Composable
+fun Dot(size: Dp, color: Color, anchor: Float) {
+    Box(
+        modifier = Modifier
+            .size(size)
+            .graphicsLayer {
+                // Vertical bounce
+                translationY = -2 * size.toPx() * anchor
+                scaleX = lerp(1f, 1.25f, anchor)
+                scaleY = lerp(1f, 1.25f, anchor)
+                alpha = lerp(0.7f, 1f, anchor)
+            }
+            .background(color, shape = CircleShape)
+    )
 }

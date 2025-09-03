@@ -3,7 +3,9 @@ package com.dev.thriftswap.presentation.screens.register
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -33,6 +35,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -52,17 +55,25 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.dev.thriftswap.R
 import com.dev.thriftswap.presentation.components.EmailInput
 import com.dev.thriftswap.presentation.components.PasswordInput
+import com.dev.thriftswap.presentation.components.ThreeDotLoading
 import com.dev.thriftswap.presentation.components.ThriftAppBar
+import com.dev.thriftswap.presentation.navigation.ThriftScreens
+import com.dev.thriftswap.utils.Response
+import com.google.firebase.auth.AuthResult
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 
 
 
 @Composable
-fun RegisterScreen(navController: NavController) {
+fun RegisterScreen(navController: NavController,
+                   registerViewModel: RegisterViewModel = hiltViewModel()
+) {
 
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
@@ -74,19 +85,100 @@ fun RegisterScreen(navController: NavController) {
             navIcon = Icons.AutoMirrored.Filled.ArrowBack,
         ) { navController.popBackStack() } }
     ) {
-        Surface(modifier = Modifier
-            .fillMaxSize()
-            .padding(it)) {
-            UserForm(
-                onCheckBoxState = {/*Handle checkbox state*/},
-                onDone = { email, password ->
-                    // Handle registration logic here
-                    Log.d("Registering", "RegisterScreen: Registering $email with password $password")
+        Content(
+            paddingValues = it,
+            registerFlowState = registerViewModel.registerFlow,
+
+            onNavigateToLogin = { navController.popBackStack() },
+
+            onRegister = { email, password ->
+                registerViewModel.register(email, password)
+            },
+            registerSuccess = {
+                navController.navigate(ThriftScreens.HomeScreen.name) {
+                    popUpTo(ThriftScreens.RegisterScreen.name) { inclusive = true }
                 }
-            )
-        }
+            },
+            registerError = {
+                coroutineScope.launch {
+                    snackbarHostState.showSnackbar(
+                        "Oops! Something went wrong, check your connection and try again"
+                    )
+                }
+            }
+        )
     }
 
+}
+
+@Composable
+fun Content(
+    paddingValues: PaddingValues,
+    registerFlowState: MutableSharedFlow<Response<AuthResult>>,
+    onNavigateToLogin: () -> Unit,
+    onRegister: (String, String) -> Unit,
+    registerSuccess: () -> Unit,
+    registerError: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(paddingValues)
+    ) {
+        // User input form
+        UserForm(
+            onCheckBoxState = { /* handle checkbox if needed */ },
+            onDone = { email, password ->
+                onRegister(email, password)
+            }
+        )
+
+        // Registration state observer (existing function)
+        RegisterState(
+            registerFlowState = registerFlowState,
+            onSuccess = registerSuccess,
+            onError = registerError
+        )
+    }
+}
+
+
+@Composable
+fun RegisterState(
+    registerFlowState: MutableSharedFlow<Response<AuthResult>>,
+    onSuccess: () -> Unit,
+    onError: () -> Unit
+) {
+    val isLoading = remember { mutableStateOf(false) }
+    if (isLoading.value) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+            ThreeDotLoading()
+        }
+    }
+    LaunchedEffect(Unit) {
+        registerFlowState.collect {
+            when (it) {
+                is Response.Loading -> {
+                    Log.i("Register state -> ", "Loading")
+                    isLoading.value = true
+                }
+
+                is Response.Error -> {
+                    Log.e("Register state -> ", it.message)
+                    isLoading.value = false
+                    onError()
+                }
+
+                is Response.Success -> {
+                    Log.i("Register state -> ", "Success")
+                    isLoading.value = false
+                    onSuccess()
+                }
+
+                Response.Idle -> {}
+            }
+        }
+    }
 }
 
 @Composable
