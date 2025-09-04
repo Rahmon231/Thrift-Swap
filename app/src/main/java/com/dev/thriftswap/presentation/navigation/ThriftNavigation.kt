@@ -25,5 +25,8 @@ fun ThriftNavigation() {
         composable(ThriftScreens.RegisterScreen.name) {
             RegisterScreen(navController = navController)
         }
+        composable(ThriftScreens.FilterScreen.name) {
+            FilterScreen(navController = navController)
+        }
     }
 }
