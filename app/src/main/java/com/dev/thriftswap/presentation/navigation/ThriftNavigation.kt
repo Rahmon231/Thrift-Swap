@@ -3,6 +3,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.dev.thriftswap.presentation.screens.filter.FilterScreen
 import com.dev.thriftswap.presentation.screens.home.HomeScreen
 import com.dev.thriftswap.presentation.screens.onboard.OnboardingScreen
 import com.dev.thriftswap.presentation.screens.register.RegisterScreen
