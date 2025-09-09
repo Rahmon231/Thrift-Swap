@@ -1,12 +1,20 @@
 package com.dev.thriftswap.presentation.screens.filter
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -23,6 +31,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -34,6 +43,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.dev.thriftswap.R
 import com.dev.thriftswap.presentation.components.ThriftAppBar
+import com.dev.thriftswap.utils.Constants.GENDER_OPTIONS
+import com.dev.thriftswap.utils.Constants.SIZE_OPTIONS
 
 @Composable
 fun FilterScreen(navController: NavController,
@@ -60,48 +71,83 @@ fun FilterScreen(navController: NavController,
 @Composable
 fun FilterScreenContent() {
     var selectedGender by remember { mutableStateOf("Men") }
+    var selectedSize by remember { mutableStateOf("L") }
+
     Column(
         modifier = Modifier.fillMaxWidth().padding(12.dp),
         verticalArrangement = Arrangement.Top
     ) {
-        Text(text = "Gender",
-            style = TextStyle(
-                color = Color(0xFF3D405B),
-                fontSize = 20.sp,
-                fontWeight = FontWeight.SemiBold,
-                fontFamily = FontFamily(Font(R.font.roboto)))
+        FilterScreenHeadings(title = "Gender")
+        SelectableRow(
+            options = GENDER_OPTIONS,
+            selectedOption = selectedGender,
+            onOptionSelected = { selectedGender = it },
+            buttonModifier = Modifier
+                .weight(1f)
+                .height(48.dp),
+            maxItemsInEachRow = Int.MAX_VALUE // single row
         )
-        GenderSelectRow(selectedGender = selectedGender){
-            selectedGender = it
-        }
+
+        FilterScreenHeadings(title = "Size")
+        SelectableRow(
+            options = SIZE_OPTIONS,
+            selectedOption = selectedSize,
+            onOptionSelected = { selectedSize = it },
+            buttonModifier = Modifier
+                .width(96.dp)
+                .height(40.dp),
+            textStyle = TextStyle(fontSize = 14.sp),
+            maxItemsInEachRow = 4 // 4 items per row
+        )
+
     }
 }
 
 @Composable
-fun GenderSelectRow(selectedGender: String = "Men",
-                    onGenderSelected: (String) -> Unit) {
-    val genders = listOf("Men", "Women", "Unisex")
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(10.dp),
+fun FilterScreenHeadings(title: String) {
+    Text(text = title,
+        style = TextStyle(
+            color = Color(0xFF3D405B),
+            fontSize = 20.sp,
+            fontWeight = FontWeight.SemiBold,
+            fontFamily = FontFamily(Font(R.font.roboto))),
+        modifier = Modifier.padding(12.dp)
+    )
+}
+
+@Composable
+fun SelectableRow(
+    options: List<String>,
+    selectedOption: String,
+    onOptionSelected: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    buttonModifier: Modifier = Modifier,
+    textStyle: TextStyle = TextStyle(fontSize = 16.sp),
+    maxItemsInEachRow: Int = Int.MAX_VALUE // 👈 configurable per use case
+) {
+    FlowRow(
+        modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        maxItemsInEachRow = maxItemsInEachRow
     ) {
-        genders.forEach { gender ->
-            val isSelected = gender == selectedGender
+        options.forEach { option ->
+            val isSelected = option == selectedOption
             Button(
-                onClick = { onGenderSelected(gender) },
-                modifier = Modifier.weight(1f),
+                onClick = { onOptionSelected(option) },
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = if (isSelected) Color(0xFFCCDCD7) else Color.Transparent,
-                    contentColor = if (isSelected) Color(0xFF446B5E) else Color.Gray
+                    containerColor = if (isSelected) Color(0xFFD0E1DB) else Color.Transparent,
+                    contentColor = if (isSelected) Color(0xFF1B4332) else Color.Gray
                 ),
                 shape = RoundedCornerShape(6.dp),
                 border = if (isSelected) null else BorderStroke(1.dp, Color.LightGray),
-                elevation = ButtonDefaults.buttonElevation(0.dp)
+                elevation = ButtonDefaults.buttonElevation(0.dp),
+                modifier = buttonModifier
             ) {
-                Text(text = gender)
+                Text(text = option, style = textStyle)
             }
         }
-        }
-
+    }
 }
+
+
