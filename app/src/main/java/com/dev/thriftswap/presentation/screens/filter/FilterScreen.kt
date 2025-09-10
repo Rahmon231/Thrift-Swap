@@ -9,23 +9,28 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.RangeSlider
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -37,12 +42,14 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.dev.thriftswap.R
 import com.dev.thriftswap.presentation.components.ThriftAppBar
+import com.dev.thriftswap.utils.Constants.COLOR_OPTIONS
 import com.dev.thriftswap.utils.Constants.GENDER_OPTIONS
 import com.dev.thriftswap.utils.Constants.SIZE_OPTIONS
 
@@ -70,6 +77,7 @@ fun FilterScreen(navController: NavController,
 
 @Composable
 fun FilterScreenContent() {
+    var priceRange by remember { mutableStateOf(0f..1000f) }
     var selectedGender by remember { mutableStateOf("Men") }
     var selectedSize by remember { mutableStateOf("L") }
 
@@ -94,12 +102,65 @@ fun FilterScreenContent() {
             selectedOption = selectedSize,
             onOptionSelected = { selectedSize = it },
             buttonModifier = Modifier
-                .width(96.dp)
+                .width(84.dp)
                 .height(40.dp),
             textStyle = TextStyle(fontSize = 14.sp),
             maxItemsInEachRow = 4 // 4 items per row
         )
+        FilterScreenHeadings(title = "Price")
+        PriceSlider(
+            sliderPosition = priceRange,
+            onValueChange = { newRange ->
+                priceRange = newRange
+            }
+        )
+        FilterScreenHeadings(title = "Color")
+        SelectableRow(
+            options = COLOR_OPTIONS,
+            selectedOption = selectedGender,
+            onOptionSelected = { selectedGender = it },
+            buttonModifier = Modifier
+                .weight(1f)
+                .height(48.dp),
+            isColor = true)
 
+    }
+}
+
+@Composable
+fun PriceSlider(
+    sliderPosition: ClosedFloatingPointRange<Float>,
+    onValueChange: (ClosedFloatingPointRange<Float>) -> Unit
+) {
+    //var sliderPosition by remember { mutableStateOf(0f..100f) }
+    Column(
+        modifier = Modifier
+            .fillMaxWidth().padding(12.dp),
+    ) {
+        Row(modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically) {
+            Text("$"+"${sliderPosition.start.toInt()}")
+            Text("$"+"${sliderPosition.endInclusive.toInt()}")
+        }
+        RangeSlider(
+            value = sliderPosition,
+            steps = 10,
+            onValueChange = onValueChange,
+            valueRange = 0f..1000f,
+            colors = SliderDefaults.colors(
+                activeTrackColor = Color(0xFF5B8E7D),
+                thumbColor = Color(0xFF5B8E7D)    ,
+                activeTickColor = Color.LightGray,
+                inactiveTrackColor = Color.LightGray,
+                inactiveTickColor = Color.LightGray,
+            ),
+
+            onValueChangeFinished = {
+                // launch some business logic update with the state you hold
+                // viewModel.updateSelectedSliderValue(sliderPosition)
+            },
+        )
     }
 }
 
@@ -123,7 +184,8 @@ fun SelectableRow(
     modifier: Modifier = Modifier,
     buttonModifier: Modifier = Modifier,
     textStyle: TextStyle = TextStyle(fontSize = 16.sp),
-    maxItemsInEachRow: Int = Int.MAX_VALUE // 👈 configurable per use case
+    isColor : Boolean = false,
+    maxItemsInEachRow: Int = Int.MAX_VALUE //  configurable per use case
 ) {
     FlowRow(
         modifier = modifier.fillMaxWidth(),
@@ -144,10 +206,30 @@ fun SelectableRow(
                 elevation = ButtonDefaults.buttonElevation(0.dp),
                 modifier = buttonModifier
             ) {
+                if (isColor){
+                    Box(
+                        modifier = Modifier
+                            .size(12.dp)
+                            .clip(CircleShape)
+                            .background(option.toColor())
+
+                    )
+                    Spacer(Modifier.width(12.dp))
+                }
                 Text(text = option, style = textStyle)
             }
         }
     }
 }
-
+private fun String.toColor(): Color {
+    return when (this.lowercase()) {
+        "white" -> Color.White
+        "red" -> Color.Red
+        "green" -> Color.Green
+        "grey" -> Color.Gray
+        "blue" -> Color.Blue
+        "pink" -> Color(0xFFFFC0CB) // light pink hex
+        else -> Color.Black
+    }
+}
 
