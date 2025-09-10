@@ -69,7 +69,7 @@ fun FilterScreen(navController: NavController,
                 title = "Filter",
                 actionIcon = Icons.Default.Delete,
                 navIcon = Icons.Default.Close,
-                onActionClicked = {/*TODO: clear filter*/},
+                onActionClicked = {filterScreenViewModel.clearFilters()},
             ) {
                 navController.popBackStack()
             }
@@ -78,18 +78,21 @@ fun FilterScreen(navController: NavController,
         Surface(modifier = Modifier
             .fillMaxSize()
             .padding(it)) {
-            FilterScreenContent()
+            FilterScreenContent(filterScreenViewModel){
+                //Populate Home Screen With Filter Result
+                //Clear Filter
+            }
         }
     }
 
 }
 
 @Composable
-fun FilterScreenContent(onShowResultClicked: (FilterOptions) -> Unit = {}) {
+fun FilterScreenContent(filterScreenViewModel: FilterScreenViewModel,
+                        onShowResultClicked: (FilterOptions) -> Unit = {}) {
     val scrollState = rememberScrollState()
-    var filterOptions by remember {
-        mutableStateOf(FilterOptions())
-    }
+
+    val filterOptions by filterScreenViewModel.filterOptions
 
     Column(modifier = Modifier.fillMaxSize() ){
         Column(
@@ -103,7 +106,7 @@ fun FilterScreenContent(onShowResultClicked: (FilterOptions) -> Unit = {}) {
             SelectableRow(
                 options = GENDER_OPTIONS,
                 selectedOption = filterOptions.gender,
-                onOptionSelected = { filterOptions = filterOptions.copy(gender = it) },
+                onOptionSelected = { filterScreenViewModel.updateGender(it) },
                 buttonModifier = Modifier
                     .weight(1f)
                     .height(48.dp),
@@ -114,7 +117,7 @@ fun FilterScreenContent(onShowResultClicked: (FilterOptions) -> Unit = {}) {
             SelectableRow(
                 options = SIZE_OPTIONS,
                 selectedOption = filterOptions.size,
-                onOptionSelected = { filterOptions = filterOptions.copy(size = it) },
+                onOptionSelected = { filterScreenViewModel.updateSize(it) },
                 buttonModifier = Modifier
                     .width(84.dp)
                     .height(40.dp),
@@ -125,14 +128,14 @@ fun FilterScreenContent(onShowResultClicked: (FilterOptions) -> Unit = {}) {
             PriceSlider(
                 sliderPosition = filterOptions.priceRange,
                 onValueChange = { newRange ->
-                    filterOptions = filterOptions.copy(priceRange = newRange)
+                    filterScreenViewModel.updatePrice(newRange)
                 }
             )
             FilterScreenHeadings(title = "Color")
             SelectableRow(
                 options = COLOR_OPTIONS,
                 selectedOption = filterOptions.color,
-                onOptionSelected = { filterOptions = filterOptions.copy(color = it) },
+                onOptionSelected = { filterScreenViewModel.updateColor(it)},
                 buttonModifier = Modifier
                     .weight(1f)
                     .height(48.dp),
@@ -141,7 +144,7 @@ fun FilterScreenContent(onShowResultClicked: (FilterOptions) -> Unit = {}) {
             SelectableRow(
                 options = BRAND_OPTIONS,
                 selectedOption = filterOptions.brand,
-                onOptionSelected = { filterOptions = filterOptions.copy(brand = it) },
+                onOptionSelected = { filterScreenViewModel.updateBrand(it) },
                 buttonModifier = Modifier
                     .weight(1f)
                     .height(48.dp),
