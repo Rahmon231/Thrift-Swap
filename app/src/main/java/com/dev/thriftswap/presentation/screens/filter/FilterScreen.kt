@@ -1,5 +1,7 @@
 package com.dev.thriftswap.presentation.screens.filter
 
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -16,8 +18,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
@@ -48,7 +52,10 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.dev.thriftswap.R
+import com.dev.thriftswap.data.model.FilterOptions
+import com.dev.thriftswap.presentation.components.BottomActionButton
 import com.dev.thriftswap.presentation.components.ThriftAppBar
+import com.dev.thriftswap.utils.Constants.BRAND_OPTIONS
 import com.dev.thriftswap.utils.Constants.COLOR_OPTIONS
 import com.dev.thriftswap.utils.Constants.GENDER_OPTIONS
 import com.dev.thriftswap.utils.Constants.SIZE_OPTIONS
@@ -68,7 +75,9 @@ fun FilterScreen(navController: NavController,
             }
         }
     ){
-        Surface(modifier = Modifier.fillMaxSize().padding(it)) {
+        Surface(modifier = Modifier
+            .fillMaxSize()
+            .padding(it)) {
             FilterScreenContent()
         }
     }
@@ -76,55 +85,77 @@ fun FilterScreen(navController: NavController,
 }
 
 @Composable
-fun FilterScreenContent() {
-    var priceRange by remember { mutableStateOf(0f..1000f) }
-    var selectedGender by remember { mutableStateOf("Men") }
-    var selectedSize by remember { mutableStateOf("L") }
-
-    Column(
-        modifier = Modifier.fillMaxWidth().padding(12.dp),
-        verticalArrangement = Arrangement.Top
-    ) {
-        FilterScreenHeadings(title = "Gender")
-        SelectableRow(
-            options = GENDER_OPTIONS,
-            selectedOption = selectedGender,
-            onOptionSelected = { selectedGender = it },
-            buttonModifier = Modifier
-                .weight(1f)
-                .height(48.dp),
-            maxItemsInEachRow = Int.MAX_VALUE // single row
-        )
-
-        FilterScreenHeadings(title = "Size")
-        SelectableRow(
-            options = SIZE_OPTIONS,
-            selectedOption = selectedSize,
-            onOptionSelected = { selectedSize = it },
-            buttonModifier = Modifier
-                .width(84.dp)
-                .height(40.dp),
-            textStyle = TextStyle(fontSize = 14.sp),
-            maxItemsInEachRow = 4 // 4 items per row
-        )
-        FilterScreenHeadings(title = "Price")
-        PriceSlider(
-            sliderPosition = priceRange,
-            onValueChange = { newRange ->
-                priceRange = newRange
-            }
-        )
-        FilterScreenHeadings(title = "Color")
-        SelectableRow(
-            options = COLOR_OPTIONS,
-            selectedOption = selectedGender,
-            onOptionSelected = { selectedGender = it },
-            buttonModifier = Modifier
-                .weight(1f)
-                .height(48.dp),
-            isColor = true)
-
+fun FilterScreenContent(onShowResultClicked: (FilterOptions) -> Unit = {}) {
+    val scrollState = rememberScrollState()
+    var filterOptions by remember {
+        mutableStateOf(FilterOptions())
     }
+
+    Column(modifier = Modifier.fillMaxSize() ){
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+                .padding(12.dp)
+                .verticalScroll(scrollState),
+            verticalArrangement = Arrangement.Top) {
+            FilterScreenHeadings(title = "Gender")
+            SelectableRow(
+                options = GENDER_OPTIONS,
+                selectedOption = filterOptions.gender,
+                onOptionSelected = { filterOptions = filterOptions.copy(gender = it) },
+                buttonModifier = Modifier
+                    .weight(1f)
+                    .height(48.dp),
+                maxItemsInEachRow = Int.MAX_VALUE // single row
+            )
+
+            FilterScreenHeadings(title = "Size")
+            SelectableRow(
+                options = SIZE_OPTIONS,
+                selectedOption = filterOptions.size,
+                onOptionSelected = { filterOptions = filterOptions.copy(size = it) },
+                buttonModifier = Modifier
+                    .width(84.dp)
+                    .height(40.dp),
+                textStyle = TextStyle(fontSize = 14.sp),
+                maxItemsInEachRow = 4 // 4 items per row
+            )
+            FilterScreenHeadings(title = "Price")
+            PriceSlider(
+                sliderPosition = filterOptions.priceRange,
+                onValueChange = { newRange ->
+                    filterOptions = filterOptions.copy(priceRange = newRange)
+                }
+            )
+            FilterScreenHeadings(title = "Color")
+            SelectableRow(
+                options = COLOR_OPTIONS,
+                selectedOption = filterOptions.color,
+                onOptionSelected = { filterOptions = filterOptions.copy(color = it) },
+                buttonModifier = Modifier
+                    .weight(1f)
+                    .height(48.dp),
+                isColor = true)
+            FilterScreenHeadings(title = "Brand")
+            SelectableRow(
+                options = BRAND_OPTIONS,
+                selectedOption = filterOptions.brand,
+                onOptionSelected = { filterOptions = filterOptions.copy(brand = it) },
+                buttonModifier = Modifier
+                    .weight(1f)
+                    .height(48.dp),
+                maxItemsInEachRow = 3
+                )
+        }
+        BottomActionButton(
+            title = "Show Result",
+            filterOptions = filterOptions,
+            onClick = { onShowResultClicked(filterOptions) }
+        )
+    }
+
+
 }
 
 @Composable
@@ -135,7 +166,8 @@ fun PriceSlider(
     //var sliderPosition by remember { mutableStateOf(0f..100f) }
     Column(
         modifier = Modifier
-            .fillMaxWidth().padding(12.dp),
+            .fillMaxWidth()
+            .padding(12.dp),
     ) {
         Row(modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,

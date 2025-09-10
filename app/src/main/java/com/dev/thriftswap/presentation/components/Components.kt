@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -34,6 +35,8 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -81,6 +84,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.dev.thriftswap.R
+import com.dev.thriftswap.data.model.FilterOptions
 import com.dev.thriftswap.presentation.navigation.ThriftScreens
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
@@ -345,4 +349,29 @@ fun Dot(size: Dp, color: Color, anchor: Float) {
             }
             .background(color, shape = CircleShape)
     )
+}
+
+@Composable
+fun BottomActionButton(
+    title: String,
+    filterOptions: FilterOptions,
+    onClick: (FilterOptions) -> Unit,
+    modifier: Modifier = Modifier,
+
+    height: Dp = 50.dp
+) {
+    Button(
+        onClick = { onClick(filterOptions) },
+        modifier = modifier
+            .fillMaxWidth()
+            .height(height)
+            .padding(horizontal = 12.dp),
+        shape = RoundedCornerShape(8.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color(0xFF5B8E7D),
+            contentColor = Color.White
+        )
+    ) {
+        Text(text = title, fontSize = 16.sp)
+    }
 }
