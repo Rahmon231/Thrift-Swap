@@ -4,6 +4,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -46,6 +47,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -110,7 +112,6 @@ fun FilterScreenContent(filterScreenViewModel: FilterScreenViewModel,
                 buttonModifier = Modifier
                     .weight(1f)
                     .height(48.dp),
-                maxItemsInEachRow = Int.MAX_VALUE // single row
             )
 
             FilterScreenHeadings(title = "Size")
@@ -119,10 +120,8 @@ fun FilterScreenContent(filterScreenViewModel: FilterScreenViewModel,
                 selectedOption = filterOptions.size,
                 onOptionSelected = { filterScreenViewModel.updateSize(it) },
                 buttonModifier = Modifier
-                    .width(84.dp)
-                    .height(40.dp),
+                    .height(48.dp),
                 textStyle = TextStyle(fontSize = 14.sp),
-                maxItemsInEachRow = 4 // 4 items per row
             )
             FilterScreenHeadings(title = "Price")
             PriceSlider(
@@ -137,7 +136,7 @@ fun FilterScreenContent(filterScreenViewModel: FilterScreenViewModel,
                 selectedOption = filterOptions.color,
                 onOptionSelected = { filterScreenViewModel.updateColor(it)},
                 buttonModifier = Modifier
-                    .weight(1f)
+                    .width(120.dp)
                     .height(48.dp),
                 isColor = true)
             FilterScreenHeadings(title = "Brand")
@@ -146,9 +145,8 @@ fun FilterScreenContent(filterScreenViewModel: FilterScreenViewModel,
                 selectedOption = filterOptions.brand,
                 onOptionSelected = { filterScreenViewModel.updateBrand(it) },
                 buttonModifier = Modifier
-                    .weight(1f)
+                    .width(120.dp)
                     .height(48.dp),
-                maxItemsInEachRow = 3
                 )
         }
         BottomActionButton(
@@ -166,7 +164,6 @@ fun PriceSlider(
     sliderPosition: ClosedFloatingPointRange<Float>,
     onValueChange: (ClosedFloatingPointRange<Float>) -> Unit
 ) {
-    //var sliderPosition by remember { mutableStateOf(0f..100f) }
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -219,14 +216,12 @@ fun SelectableRow(
     modifier: Modifier = Modifier,
     buttonModifier: Modifier = Modifier,
     textStyle: TextStyle = TextStyle(fontSize = 16.sp),
-    isColor : Boolean = false,
-    maxItemsInEachRow: Int = Int.MAX_VALUE //  configurable per use case
+    isColor: Boolean = false,
 ) {
     FlowRow(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
-        maxItemsInEachRow = maxItemsInEachRow
     ) {
         options.forEach { option ->
             val isSelected = option == selectedOption
@@ -241,21 +236,25 @@ fun SelectableRow(
                 elevation = ButtonDefaults.buttonElevation(0.dp),
                 modifier = buttonModifier
             ) {
-                if (isColor){
+                if (isColor) {
                     Box(
                         modifier = Modifier
                             .size(12.dp)
                             .clip(CircleShape)
                             .background(option.toColor())
-
                     )
                     Spacer(Modifier.width(12.dp))
                 }
-                Text(text = option, style = textStyle)
+                Text(text = option,
+                    style = textStyle,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis)
             }
         }
     }
 }
+
+
 private fun String.toColor(): Color {
     return when (this.lowercase()) {
         "white" -> Color.White

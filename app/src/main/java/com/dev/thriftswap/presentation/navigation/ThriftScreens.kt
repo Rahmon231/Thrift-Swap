@@ -8,6 +8,7 @@ enum class ThriftScreens {
 
     RegisterScreen,
     FilterScreen,
+    ProductDetailScreen,
     HomeScreen;
     companion object {
         fun fromRoute(route: String?): ThriftScreens
@@ -17,6 +18,7 @@ enum class ThriftScreens {
             RegisterScreen.name -> RegisterScreen
             HomeScreen.name -> HomeScreen
             FilterScreen.name-> FilterScreen
+            ProductDetailScreen.name -> ProductDetailScreen
 
             null -> HomeScreen
             else -> throw IllegalArgumentException("Route $route is not recognized")
