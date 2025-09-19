@@ -81,6 +81,7 @@ fun FilterScreen(navController: NavController,
             .fillMaxSize()
             .padding(it)) {
             FilterScreenContent(filterScreenViewModel){
+                //GET the options from viewModel -> filterOptions variable
                 //Populate Home Screen With Filter Result
                 //Clear Filter
             }

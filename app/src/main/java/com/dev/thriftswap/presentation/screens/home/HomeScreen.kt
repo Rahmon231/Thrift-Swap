@@ -7,6 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,13 +16,19 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -43,12 +50,17 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
+import com.dev.thriftswap.R
+import com.dev.thriftswap.data.model.RecommendedItem
 import com.dev.thriftswap.presentation.components.InputField
 import com.dev.thriftswap.presentation.components.ThriftAppBar
 import com.dev.thriftswap.presentation.navigation.ThriftScreens
@@ -60,6 +72,7 @@ import kotlinx.coroutines.flow.filter
 fun HomeScreen(navController: NavController,
                homeViewModel: HomeViewModel = hiltViewModel()
 ){
+    val recommendedItems by homeViewModel.recommended.collectAsState()
     val context = LocalContext.current
     Scaffold(
         topBar = {
@@ -86,13 +99,111 @@ fun HomeScreen(navController: NavController,
                     navController = navController) { searchItem->
                     Log.d("Search Item", "HomeScreen: $searchItem")
                 }
+                HomeTitleRow(title = "Category")
                 CategoryRow(homeViewModel = homeViewModel){ categoryId ->
                     navController.navigate(ThriftScreens.ProductDetailScreen.name + "/$categoryId")
+                }
+                HomeTitleRow(title = "Recommended", subtitle = "show more"){
+                    //TODO: Implement SHOW MORE functionality
+                    Toast.makeText(context, "Show More Clicked", Toast.LENGTH_SHORT).show()
+                }
+                RecommendedList(items = recommendedItems) { selectedItem ->
+                    // handle click, e.g., navigate to detail screen
                 }
             }
         }
     }
 }
+@Composable
+fun HomeTitleRow(title: String,
+                 subtitle: String = "",
+                 onShowMoreClick: () -> Unit = {}){
+    Row(modifier = Modifier.fillMaxWidth().padding(top = 10.dp, start = 16.dp, end = 16.dp, bottom = 10.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically) {
+        Text(text = title,
+            style = TextStyle(
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold,
+                fontFamily = FontFamily(Font(R.font.roboto))))
+        Text(text = subtitle,
+            fontWeight = FontWeight.W400,
+            fontSize = 12.sp,
+            color = Color(0xFF5B8E7D),
+            fontFamily = FontFamily(Font(R.font.roboto)),
+            modifier = Modifier.clickable { onShowMoreClick.invoke() })
+            }
+    }
+
+@Composable
+fun RecommendedItemCard(item: RecommendedItem, onClick: () -> Unit = {}) {
+    Card(
+        modifier = Modifier
+            .padding(8.dp)
+            .width(160.dp) // adjust card width
+            .clickable { onClick() },
+        shape = RoundedCornerShape(12.dp),
+        elevation = CardDefaults.cardElevation(4.dp),
+        colors = CardDefaults.cardColors(Color.White)
+    ) {
+        Column(
+            modifier = Modifier.padding(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Image(
+                painter = painterResource(id = item.imageRes),
+                contentDescription = item.name,
+                modifier = Modifier
+                    .height(120.dp)
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(8.dp)),
+                contentScale = ContentScale.Crop
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = item.name,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 14.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+
+            Text(
+                text = "₦${item.price}",
+                color = Color(0xFF5B8E7D),
+                fontWeight = FontWeight.Bold,
+                fontSize = 13.sp
+            )
+
+            Text(
+                text = item.grade,
+                fontSize = 12.sp,
+                color = Color.Gray
+            )
+        }
+    }
+}
+
+@Composable
+fun RecommendedList(items: List<RecommendedItem>,
+                    onItemClick: (RecommendedItem) -> Unit = {}) {
+    LazyVerticalGrid(
+        columns = GridCells.Adaptive(minSize = 160.dp),
+        contentPadding = PaddingValues(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalArrangement =Arrangement.spacedBy(12.dp),
+        modifier = Modifier.fillMaxSize()
+    ) {
+        items(items) { item ->
+            RecommendedItemCard(item = item) {
+                onItemClick(item)
+            }
+        }
+    }
+}
+
+
 
 @OptIn(FlowPreview::class)
 @Composable

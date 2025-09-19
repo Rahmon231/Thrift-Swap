@@ -1,6 +1,7 @@
 package com.dev.thriftswap.di
 
 import com.dev.thriftswap.data.datasources.local.CategoryRepository
+import com.dev.thriftswap.data.datasources.local.RecommendedRepository
 import com.dev.thriftswap.domain.repository.AuthenticationRepository
 import com.dev.thriftswap.data.repositories.AuthenticationRepositoryImpl
 import com.google.firebase.auth.FirebaseAuth
@@ -41,6 +42,12 @@ object AppModule {
     @Singleton
     fun provideCategoryRepository(): CategoryRepository {
         return CategoryRepository()
+
+    }
+    @Provides
+    @Singleton
+    fun provideRecommendedRepository(): RecommendedRepository {
+        return RecommendedRepository()
 
     }
 
