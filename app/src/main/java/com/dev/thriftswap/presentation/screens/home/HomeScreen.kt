@@ -162,25 +162,50 @@ fun RecommendedItemCard(item: RecommendedItem, onClick: () -> Unit = {}) {
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = item.name,
-                fontWeight = FontWeight.SemiBold,
+                text = item.category,
+                fontWeight = FontWeight.Light,
                 fontSize = 14.sp,
                 maxLines = 1,
+                color = Color.Gray,
+                modifier = Modifier.align(Alignment.Start),
                 overflow = TextOverflow.Ellipsis
             )
 
-            Text(
-                text = "₦${item.price}",
-                color = Color(0xFF5B8E7D),
-                fontWeight = FontWeight.Bold,
-                fontSize = 13.sp
-            )
+            Row(modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = item.name,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 12.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    text = item.size,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 12.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+            Row(modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = "₦${item.price}",
+                    color = Color(0xFF5B8E7D),
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 13.sp
+                )
 
-            Text(
-                text = item.grade,
-                fontSize = 12.sp,
-                color = Color.Gray
-            )
+                Text(
+                    text = item.grade,
+                    fontSize = 12.sp,
+                    color = Color.Gray
+                )
+            }
+
         }
     }
 }
