@@ -42,6 +42,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldColors
@@ -82,10 +84,13 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.lerp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.dev.thriftswap.R
 import com.dev.thriftswap.data.model.FilterOptions
 import com.dev.thriftswap.presentation.navigation.ThriftScreens
+import com.dev.thriftswap.utils.BottomNavDestination
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filter
@@ -139,6 +144,34 @@ fun ThriftAppBar(
         windowInsets = WindowInsets(0.dp)
     )
 }
+
+@Composable
+fun BottomNavBar(navController: NavHostController) {
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+
+    NavigationBar(
+        windowInsets = WindowInsets(0.dp),
+        containerColor = Color.Transparent) {
+        BottomNavDestination.entries.forEach { destination ->
+            NavigationBarItem(
+                selected = currentRoute == destination.route,
+                onClick = {
+                    if (currentRoute != destination.route) {
+                        navController.navigate(destination.route) {
+                            popUpTo(navController.graph.startDestinationId) { saveState = true }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    }
+                },
+                icon = { Icon(destination.icon, contentDescription = destination.label) },
+                label = { Text(destination.label) },
+            )
+        }
+    }
+}
+
 @Preview
 @Composable
 fun AppLogo(){

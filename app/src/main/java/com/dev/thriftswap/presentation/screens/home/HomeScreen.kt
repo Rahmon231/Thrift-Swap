@@ -108,7 +108,8 @@ fun HomeScreen(navController: NavController,
                     Toast.makeText(context, "Show More Clicked", Toast.LENGTH_SHORT).show()
                 }
                 RecommendedList(items = recommendedItems) { selectedItem ->
-                    // handle click, e.g., navigate to detail screen
+                    // handle click of recommended item
+                    Toast.makeText(context, "Item Clicked: ${selectedItem.name}", Toast.LENGTH_SHORT).show()
                 }
             }
         }
