@@ -14,7 +14,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.dev.thriftswap.presentation.components.BottomNavBar
 import com.dev.thriftswap.presentation.screens.cart.CartScreen
-import com.dev.thriftswap.presentation.screens.detail.ProductDetailScreen
+import com.dev.thriftswap.presentation.screens.detail.CategoryDetailScreen
 import com.dev.thriftswap.presentation.screens.filter.FilterScreen
 import com.dev.thriftswap.presentation.screens.home.HomeScreen
 import com.dev.thriftswap.presentation.screens.onboard.OnboardingScreen
@@ -65,7 +65,7 @@ fun ThriftNavigation() {
                 arguments = listOf(navArgument("categoryId") { type = NavType.StringType })
             ) { backStackEntry ->
                 val categoryId = backStackEntry.arguments?.getString("categoryId") ?: ""
-                ProductDetailScreen(navController = navController, categoryId = categoryId)
+                CategoryDetailScreen(navController = navController, categoryId = categoryId)
             }
             composable(ThriftScreens.CartScreen.name) {
                 CartScreen(navController = navController)
