@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import com.dev.thriftswap.data.datasources.local.CategoryRepository
 import com.dev.thriftswap.data.datasources.local.RecommendedRepository
 import com.dev.thriftswap.data.model.Category
+import com.dev.thriftswap.data.model.CategoryItem
 import com.dev.thriftswap.data.model.RecommendedItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -40,5 +41,9 @@ class HomeViewModel @Inject constructor(
 
     fun getCategory(id: String): Category? {
         return categories.value.find { it.categoryId == id }
+    }
+
+    fun getCategoriesItemById(categoryId: String): List<CategoryItem> {
+        return categoryRepository.getCategoryItems(categoryId)
     }
 }

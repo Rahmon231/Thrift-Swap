@@ -137,11 +137,14 @@ fun HomeTitleRow(title: String,
     }
 
 @Composable
-fun RecommendedItemCard(item: RecommendedItem, onClick: () -> Unit = {}) {
+fun RecommendedItemCard(modifier:Modifier = Modifier,
+                        imageModifier: Modifier = Modifier,
+                        item: RecommendedItem,
+                        onClick: () -> Unit = {}) {
     Card(
-        modifier = Modifier
+        modifier = modifier
             .padding(8.dp)
-            .width(160.dp) // adjust card width
+            .width(160.dp)
             .clickable { onClick() },
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(4.dp),
@@ -154,7 +157,7 @@ fun RecommendedItemCard(item: RecommendedItem, onClick: () -> Unit = {}) {
             Image(
                 painter = painterResource(id = item.imageRes),
                 contentDescription = item.name,
-                modifier = Modifier
+                modifier = imageModifier
                     .height(120.dp)
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(8.dp)),
